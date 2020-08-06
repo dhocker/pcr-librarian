@@ -89,25 +89,8 @@ class PCRLibrarianApp(Tk):
         """
         MIN_WIDTH = 100
 
-        # will return x11 (Linux), win32 or aqua (macOS)
-        gfx_platform = self.tk.call('tk', 'windowingsystem')
-
-        # App menu bar
-        self._menu_bar = Menu(self)
-
-        # macOS app menu covering things specific to macOS X
-        if gfx_platform == "aqua":
-            self._appmenu = Menu(self._menu_bar, name='apple')
-            self._appmenu.add_command(label='About PCR Librarian', command=self._show_about)
-            self._appmenu.add_separator()
-            self._menu_bar.add_cascade(menu=self._appmenu, label='PCRLibrarian')
-
-            self.createcommand('tk::mac::ShowPreferences', self._show_preferences)
-        elif gfx_platform == "win32":
-            # TODO Build a menu for Windows
-            pass
-
-        self.config(menu=self._menu_bar)
+        # Create a menu bar for the current OS
+        self._create_menu()
 
         # Control/widget experimentation
         self.config(padx=10)
@@ -137,12 +120,12 @@ class PCRLibrarianApp(Tk):
 
         # Select a directory
         self._btn_dir_button = Button(master=self._fr_dir, text="Select Control Map Directory", command=self._on_select_directory)
-        self._btn_dir_button.grid(row=0, column=0)
+        self._btn_dir_button.grid(row=0, column=0, padx=5, pady=5)
 
         # Recently used directories
         self._cb_recent_dirs = Combobox(master=self._fr_dir, width=50,
                                         values=Configuration.get_recent())
-        self._cb_recent_dirs.grid(row=0, column=1)
+        self._cb_recent_dirs.grid(row=0, column=1, padx=5, pady=5)
         self._cb_recent_dirs.bind("<<ComboboxSelected>>", self._on_recent_directory)
 
         self._fr_dir.grid(row=r, column=0, padx=10)
@@ -161,16 +144,16 @@ class PCRLibrarianApp(Tk):
         # Action buttons are inside the button frame on one row
 
         self._btn_receive_current_button = Button(master=self._button_frame, text="Receive Current Map", state=tkinter.DISABLED, command=self._on_receive_current_map)
-        self._btn_receive_current_button.grid(row=0, column=0)
+        self._btn_receive_current_button.grid(row=0, column=0, padx=5)
 
         self._btn_receive_all_button = Button(master=self._button_frame, text="Receive All Maps", state=tkinter.DISABLED, command=self._on_receive_all_maps)
-        self._btn_receive_all_button.grid(row=0, column=1)
+        self._btn_receive_all_button.grid(row=0, column=1, padx=5)
 
         self._btn_send_button = Button(master=self._button_frame, text="Send Control Map Files", state=tkinter.DISABLED, command=self._on_send)
-        self._btn_send_button.grid(row=0, column=2)
+        self._btn_send_button.grid(row=0, column=2, padx=5)
 
         self._btn_quit_button = Button(master=self._button_frame, text="Quit", command=self._on_close)
-        self._btn_quit_button.grid(row=0, column=3)
+        self._btn_quit_button.grid(row=0, column=3, padx=5)
 
         # MIDI in/out ports listboxes
         self._lb_midiports_frame = LabelFrame(self, text="MIDI Ports", pady=5, padx=5)
@@ -215,6 +198,36 @@ class PCRLibrarianApp(Tk):
 
         # Put the focus in the directory text box
         self._ent_directory.focus_set()
+
+    def _create_menu(self):
+        # will return x11 (Linux), win32 or aqua (macOS)
+        gfx_platform = self.tk.call('tk', 'windowingsystem')
+
+        # App menu bar
+        self._menu_bar = Menu(self)
+
+        # macOS app menu covering things specific to macOS X
+        if gfx_platform == "aqua":
+            self._appmenu = Menu(self._menu_bar, name='apple')
+            self._appmenu.add_command(label='About PCR Librarian', command=self._show_about)
+            self._appmenu.add_separator()
+            self._menu_bar.add_cascade(menu=self._appmenu, label='PCRLibrarian')
+
+            self.createcommand('tk::mac::ShowPreferences', self._show_preferences)
+        # Windows or Linux
+        elif gfx_platform in ["win32", "x11"]:
+            # Build a menu for Windows
+            filemenu = Menu(self._menu_bar, tearoff=0)
+            filemenu.add_command(label="Clear recent directories list", command=None)
+            filemenu.add_separator()
+            filemenu.add_command(label="Exit", command=self._on_close)
+            self._menu_bar.add_cascade(label="File", menu=filemenu)
+
+            helpmenu = Menu(self._menu_bar, tearoff=0)
+            helpmenu.add_command(label="About", command=self._show_about)
+            self._menu_bar.add_cascade(label="Help", menu=helpmenu)
+
+        self.config(menu=self._menu_bar)
 
     def _set_statusbar(self, text):
         """
