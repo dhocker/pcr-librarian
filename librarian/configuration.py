@@ -21,7 +21,8 @@ import json
 
 class Configuration():
     active_config = {
-        "recent": []
+        "recent": [],
+        "last_recent": ""
     }
 
     @classmethod
@@ -85,6 +86,16 @@ class Configuration():
     def clear_recent(cls):
         cls.active_config["recent"].clear()
         cls.save_configuration()
+
+    @classmethod
+    def set_last_recent(cls, dir):
+        cls.active_config["last_recent"] = dir
+        cls.save_configuration()
+
+
+    @classmethod
+    def get_last_recent(cls):
+        return cls.active_config["last_recent"]
 
     @classmethod
     def get_file_path(cls):

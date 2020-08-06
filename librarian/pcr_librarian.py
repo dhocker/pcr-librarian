@@ -80,6 +80,9 @@ class PCRLibrarianApp(Tk):
         # Handle app exit
         self.protocol("WM_DELETE_WINDOW", self._on_close)
 
+        # Restore last used directory
+        self._set_directory(Configuration.get_last_recent())
+
     def _create_widgets(self, sw, sh):
         """
         Create the UI widgets
@@ -353,9 +356,9 @@ class PCRLibrarianApp(Tk):
         :return:
         """
         print(self._ent_directory.get())
-        # TODO Save the directory setting?
-        # if self._are_unsaved_changes():
-        #     return False
+        # Save the directory setting?
+        Configuration.set_last_recent(self._ent_directory.get())
+        # Essentially, this terminates the app by destroying the main window
         self.destroy()
         return True
 
