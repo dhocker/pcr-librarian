@@ -82,6 +82,11 @@ class Configuration():
         cls.save_configuration()
 
     @classmethod
+    def clear_recent(cls):
+        cls.active_config["recent"].clear()
+        cls.save_configuration()
+
+    @classmethod
     def get_file_path(cls):
         """
         Returns the full path to the configuration file

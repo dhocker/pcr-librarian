@@ -206,19 +206,22 @@ class PCRLibrarianApp(Tk):
         # App menu bar
         self._menu_bar = Menu(self)
 
-        # macOS app menu covering things specific to macOS X
         if gfx_platform == "aqua":
+            # macOS app menu covering things specific to macOS X
             self._appmenu = Menu(self._menu_bar, name='apple')
             self._appmenu.add_command(label='About PCR Librarian', command=self._show_about)
             self._appmenu.add_separator()
             self._menu_bar.add_cascade(menu=self._appmenu, label='PCRLibrarian')
 
             self.createcommand('tk::mac::ShowPreferences', self._show_preferences)
-        # Windows or Linux
-        elif gfx_platform in ["win32", "x11"]:
-            # Build a menu for Windows
+
             filemenu = Menu(self._menu_bar, tearoff=0)
-            filemenu.add_command(label="Clear recent directories list", command=None)
+            filemenu.add_command(label="Clear recent directories list", command=self._on_clear_recent)
+            self._menu_bar.add_cascade(label="File", menu=filemenu)
+        elif gfx_platform in ["win32", "x11"]:
+            # Build a menu for Windows or Linux
+            filemenu = Menu(self._menu_bar, tearoff=0)
+            filemenu.add_command(label="Clear recent directories list", command=self._on_clear_recent)
             filemenu.add_separator()
             filemenu.add_command(label="Exit", command=self._on_close)
             self._menu_bar.add_cascade(label="File", menu=filemenu)
@@ -254,6 +257,10 @@ class PCRLibrarianApp(Tk):
         self._set_directory(directory)
 
         self._set_statusbar("Ready")
+
+    def _on_clear_recent(self):
+        Configuration.clear_recent()
+        self._cb_recent_dirs.config(values=Configuration.get_recent())
 
     def _set_directory(self, directory):
         if directory:
